@@ -1,0 +1,35 @@
+import numpy as np
+
+class Perceptron:
+    def __init__(self, lr=0.1, epochs=1000):
+        self.lr = lr
+        self.epochs = epochs
+
+    def sigmoid(self, x):
+        return 1 / (1 + np.exp(-x))
+
+    def fit(self, X, y):
+        self.weights = np.zeros(X.shape[1])
+        self.bias = 0
+        for _ in range(self.epochs):
+            for xi, yi in zip(X, y):
+                pred = self.sigmoid(np.dot(xi, self.weights) + self.bias)
+                error = yi - pred
+                self.weights += self.lr * error * pred * (1 - pred) * xi
+                self.bias += self.lr * error * pred * (1 - pred)
+
+    def predict(self, X):
+        return (self.sigmoid(np.dot(X, self.weights) + self.bias) >= 0.5).astype(int)
+
+# Training and testing function
+def train_and_test(name, X, y):
+    model = Perceptron()
+    model.fit(X, y)
+    print(f"\n{name} Gate Predictions:")
+    for xi in X:
+        print(f"Input: {xi} -> {model.predict(xi)}")
+
+# Gate data
+X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
+train_and_test("AND", X, [0, 0, 0, 1])
+train_and_test("OR", X, [0, 1, 1, 1])
